@@ -1,0 +1,46 @@
+/*#region root vars*/
+:root {
+    --transition-normal: 0.3s;
+
+    --header-background-color: #FFFFFF;
+    --line-color: #E7E7E7;
+    --info-background-color: #3D965E;
+    --warn-background-color: #EF3D5E;
+    --header-foreground-color: #000000;
+    --accent-color1: #1771F1;
+    --button1-background-color: #627BAA;
+    --button2-background-color: #74A053;
+    --footer-background-color:#F1F2F2;
+
+    --font-normal-color: #000000;
+    --font-button-color: #FFFFFF;
+    
+    --border-color:#E7E7E7FF;
+    --border-color-none:#FFFFFF00;
+    --border-color-accent:#1771F1;
+    
+    --border-normal: 2px solid var(--border-color);
+    --border-normal-none: 2px solid var(--border-color-none);
+    --border-normal-accent: 2px solid var(--border-color-accent);
+
+    --border-normal-radius : 5px;
+    --border-middle-radius : 10px;
+    --border-large-radius  : 15px;
+
+    --button-shadow: 2px 2px 5px #0000007F;
+
+    --max-width-conteiner: 1200px;
+    --max-width-conteiner-01: 100px;
+    --max-width-conteiner-02: 200px;
+    --max-width-conteiner-03: 300px;
+    --max-width-conteiner-04: 400px;
+    --max-width-conteiner-05: 500px;
+    --max-width-conteiner-06: 600px;
+    --max-width-conteiner-07: 700px;
+    --max-width-conteiner-08: 800px;
+    --max-width-conteiner-09: 900px;
+    --max-width-conteiner-10: 1000px;
+    --max-width-conteiner-11: 1100px;
+}
+
+/*#endregion root vars*/
