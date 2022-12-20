@@ -7,7 +7,12 @@
     aria-labelledby="productEditLabel">
   
     <div class="offcanvas-header border-bottom bg-primary text-white">
-        <h1 class="offcanvas-title fs-5 w-100 d-flex flex-row" id="productEditLabel">Товар<div class="px-2">-</div><div id="productName"></div></h1>
+        <h1 class="offcanvas-title fs-5 w-100 d-flex flex-row" id="productEditLabel">Товар<div class="px-2">-</div><div id="productName" class="offcanvas-header-name"></div></h1>
+        <span class="product-go-link me-2">
+            <svg class="link" width="24" height="24" fill="currentColor" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ReplyAllTwoToneIcon" tabindex="-1" title="ReplyAllTwoTone">
+                <path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"></path>
+            </svg>
+        </span>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
@@ -31,11 +36,6 @@
                 </svg>
             </span>
             <input type="text" class="base-data form-control" bd-column="URL адрес" id="product_url">
-            <span class="input-group-text">
-                <svg class="link" width="24" height="24" fill="currentColor" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ReplyAllTwoToneIcon" tabindex="-1" title="ReplyAllTwoTone">
-                    <path d="M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"></path>
-                </svg>
-            </span>
         </div>
 
         <div class="form-check form-switch form-check-reverse mb-3" style="text-align: left;">
@@ -43,62 +43,31 @@
             <label class="form-check-label" for="productActivity">Активен</label>
         </div>
 
-        <div class="input-group mb-3">
-            <span class="input-group-text">Описание</span>
-            <textarea type="text" id="product_description" class="base-data form-control" bd-column="Описание" aria-label="With textarea"></textarea>
+        <div class="accordion mb-3" id="accordionImages">
+            <div class="accordion-item">
+                <div class="accordion-header border-bottom p-2 text-primary d-flex flex-row" id="headingOne" style="background: #86b7fe2f;">
+                    <div>Описание</div>
+                </div>
+
+                <textarea type="text" id="product_description" class="base-data form-control border-0" bd-column="Описание" aria-label="With textarea"></textarea>
+            </div>
         </div>
 
         <div class="accordion mb-3" id="accordionImages">
             <div class="accordion-item">
-                <div class="accordion-header border-bottom p-2 text-primary" id="headingOne" style="background: #86b7fe2f;">
-                    Изображения
-                </div>
-
-                <div id="collapseImages" class="accordion-collapse p-3" aria-labelledby="headingOne" data-bs-parent="#accordionImages">
-                    <div class="w-100 mb-3 d-flex">
+                <div class="accordion-header border-bottom p-2 text-primary d-flex flex-row" id="headingOne" style="background: #86b7fe2f;">
+                    <div>Изображения</div>
+                    <div class="w-100 d-flex">
                         <svg class="addProductImage text-primary ms-auto" width="24" height="24" fill="currentColor" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AddToPhotosTwoToneIcon" tabindex="-1" title="AddToPhotosTwoTone">
                             <path d="M20 4H8v12h12V4zm-1 7h-4v4h-2v-4H9V9h4V5h2v4h4v2z" opacity=".3"></path>
                             <path d="M4 22h14v-2H4V6H2v14c0 1.1.9 2 2 2zm4-4h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2zM8 4h12v12H8V4zm7 1h-2v4H9v2h4v4h2v-4h4V9h-4z"></path>
                         </svg>
                     </div>
-
-                    <div class="gallery w-100 d-flex flex-wrap align-self-center">
-                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="accordion mb-3" id="accordionProperties">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button p-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProperties" aria-expanded="true" aria-controls="collapseProperties" style="height: 38px;">
-                        Свойства
-                    </button>
-                </h2>
-                <div id="collapseProperties" class="accordion-collapse p-3" aria-labelledby="headingOne" data-bs-parent="#accordionProperties">
-
-                    <?php
-                        $columns = array();
-                        $tableColumns = DB::getSchemaBuilder()->getColumnListing('catalog');
-                        foreach($tableColumns as $column){
-                            if (mb_strpos($column, 'Свойство: ') !== false){
-                                array_push($columns, str_replace('Свойство: ', '', $column));
-                            }
-                        }
-                    ?>
-
-                    @foreach($columns as $column)
-                        @if($loop->last)
-                            <div class="input-group">
-                        @else
-                            <div class="input-group mb-3">
-                        @endif
-                                <span class="input-group-text">{{$column}}</span>
-                                <input type="text" class="base-data form-control" bd-column="Свойство: {{$column}}" id="product_brend">
-                            </div>
-                    @endforeach
-
+                <div class="gallery w-100 d-flex flex-wrap align-self-center">
                 </div>
+
             </div>
         </div>
 
@@ -127,7 +96,7 @@
             <input type="text" class="base-data form-control" bd-column="Бренд" id="product_price_old">
         </div>
 
-        <div class="accordion" id="accordionCategories">
+        <div class="accordion mb-3" id="accordionCategories">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
                     <button class="accordion-button collapsed p-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategories" aria-expanded="false" aria-controls="collapseCategories" style="height: 38px;">
@@ -149,6 +118,44 @@
 
             </div>
         </div>
+
+        <div class="accordion" id="accordionProperties">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button p-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProperties" aria-expanded="true" aria-controls="collapseProperties" style="height: 38px;">
+                        Свойства
+                    </button>
+                </h2>
+                <div id="collapseProperties" class="accordion-collapse collapse show p-3" aria-labelledby="headingOne" data-bs-parent="#accordionProperties">
+
+                    <?php
+                        $columns = array();
+
+                        $properties = DB::table('properties')
+                        ->orderBy('order_place')
+                        ->get();
+
+                        foreach($properties as $property){
+                            $propertyName  = str_replace('Свойство: ' ,'' , $property->column_name);
+                            array_push($columns, $propertyName);
+                        }
+                    ?>
+
+                    @foreach($columns as $column)
+                        @if($loop->last)
+                            <div class="input-group">
+                        @else
+                            <div class="input-group mb-3">
+                        @endif
+                                <span class="input-group-text">{{$column}}</span>
+                                <input type="text" class="base-data form-control" bd-column="Свойство: {{$column}}" id="product_brend">
+                            </div>
+                    @endforeach
+
+                </div>
+            </div>
+        </div>
+
 
     </div>
 
@@ -173,11 +180,23 @@
     }
 
     #productEdit {
-        min-width: 700px;
+        min-width: 50%;
     }
 
     #productEdit .input-group span:first-child {
         min-width: 120px;
     }
+
+    .addProductImage {
+        transition: 0.3s;
+    }
+
+    .addProductImage:hover {
+        cursor: pointer;
+        transform: scale(1.3);
+        filter: drop-shadow(0px 0px 2px #0000007F);
+        
+    }
+
 
 </style>

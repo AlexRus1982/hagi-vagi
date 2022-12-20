@@ -33,7 +33,6 @@ class AdminCatalog {
         this.token = $('meta[name="csrf-token"]').attr('content');
         this.MakeCatalog();
         this.MakeKeys();
-        messages.Success('Добро пожаловать.');
     }
 
 
@@ -41,23 +40,24 @@ class AdminCatalog {
 
         $('.add-button.add-catalog').off('click');
         $('.add-button.add-catalog').on('click', ()=>{
-            $('#catalogModal #category_name').val('');
+            $('#catalogWindow .base-data').val('');
+            $('.catalog-go-link').hide();
             
-            $('#catalogModal').modal('show');
+            $('#catalogWindow').offcanvas('show');
             
-            $('#catalogModal .accordion-body').collapse('hide');
+            $('#catalogWindow .accordion-body').collapse('hide');
 
             if (!$('button#catalog_list_header').hasClass('collapsed')){
                 $('button#catalog_list_header').trigger('click');
             }
 
-            $('#catalogModal').attr('parent_id', $(`#items-catalog .item-label.selected`).attr('category-id'));
-            $('#catalogModal').attr('item_id', $(`#items-catalog .item-label.selected`).attr('item-id'));
-            $('#catalogModal').attr('category_id', $(`#category-title`).attr('category-id'));
-            $('#catalogModal .list-group .list-group-item').removeClass('active');
+            $('#catalogWindow').attr('parent_id', $(`#items-catalog .item-label.selected`).attr('category-id'));
+            $('#catalogWindow').attr('item_id', $(`#items-catalog .item-label.selected`).attr('item-id'));
+            $('#catalogWindow').attr('category_id', $(`#category-title`).attr('category-id'));
+            $('#catalogWindow .list-group .list-group-item').removeClass('active');
 
-            const id = $('#catalogModal').attr('category_id');
-            $(`#catalogModal .list-group .list-group-item[category_id="${id}"]`).addClass('active');
+            const id = $('#catalogWindow').attr('category_id');
+            $(`#catalogWindow .list-group .list-group-item[category_id="${id}"]`).addClass('active');
 
             const categoryName = $(`#items-catalog .item-label.selected`).prop('innerHTML');
             const newName = $('#catalog_list_header').prop('innerHTML').split('-')[0] + ' - ' + categoryName.toLowerCase();
@@ -74,9 +74,9 @@ class AdminCatalog {
                 console.debug('statistics');
             }
             else {
-                $('#productModal').modal('toggle');
+                $('#productsList').offcanvas('show');
             
-                $('#productModal .accordion-body').collapse('hide');
+                $('#productsList .accordion-body').collapse('hide');
     
                 if (!$('button#catalog_list_header').hasClass('collapsed')){
                     $('button#catalog_list_header').trigger('click');
@@ -121,21 +121,21 @@ class AdminCatalog {
                                 </div>
                             `;
                         }
-                        $('#productModal .table-items .table-items-body').empty().append(listHTML);
+                        $('#productsList .table-items .table-items-body').empty().append(listHTML);
     
                     },
                     error: (e)=>console.warn('error', e),
                 });
                 //*/
     
-                $('#productModal').attr('parent_id', $('.item-wrapper .item-label.selected').attr('category-id'));
-                $('#productModal').attr('category_id', $(`#category-title`).attr('category-id'));
-                $('#productModal .list-group .list-group-item').removeClass('active');
+                $('#productsList').attr('parent_id', $('.item-wrapper .item-label.selected').attr('category-id'));
+                $('#productsList').attr('category_id', $(`#category-title`).attr('category-id'));
+                $('#productsList .list-group .list-group-item').removeClass('active');
     
-                const id = $('#productModal').attr('category_id');
-                $(`#productModal .list-group .list-group-item[category_id="${id}"]`).addClass('active');
+                const id = $('#productsList').attr('category_id');
+                $(`#productsList .list-group .list-group-item[category_id="${id}"]`).addClass('active');
     
-                const categoryName = $(`#productModal .list-group .list-group-item[category_id="${id}"]`).prop('innerHTML');
+                const categoryName = $(`#productsList .list-group .list-group-item[category_id="${id}"]`).prop('innerHTML');
                 const newName = $('#product_list_header').prop('innerHTML').split('-')[0] + ' - ' + categoryName.toLowerCase();
                 $('#parentCatalog').prop('innerHTML', categoryName.toLowerCase());
                 $('#product_list_header').prop('innerHTML', newName);
@@ -204,7 +204,13 @@ class AdminCatalog {
                 return;
             }
             
-            nextElement.before(activeElement);
+            if (nextElement) {
+                nextElement.before(activeElement);
+            }
+            else {
+                $('.table-item').last().after(activeElement);
+            }
+
         });
         // #endregion
 
@@ -254,6 +260,68 @@ class AdminCatalog {
             }
         });
 
+    }
+
+    ProductGalleryKeys() {
+        $('.gallery .img-thumbnail').attr('draggable', 'true');
+
+        $('.gallery .img-thumbnail').off('mousedown');
+        $('.gallery .img-thumbnail').on('mousedown', (event)=>{
+            if ($(event.target).hasClass('img-thumbnail')){
+                this._thumbStartDragg = true;
+            }
+        });
+
+        $('.gallery .img-thumbnail').off('dragstart');
+        $('.gallery .img-thumbnail').on('dragstart', (event)=>{
+            if (!this._thumbStartDragg){
+                event.preventDefault();
+                return;
+            }
+
+            $(event.target).addClass(`dragging`);
+        });
+
+        $('.gallery .img-thumbnail').off('dragend');
+        $('.gallery .img-thumbnail').on('dragend', (event)=>{
+            $(event.target).removeClass(`dragging`);
+            this._thumbStartDragg = false;
+        });
+
+        const getImgNextElement = (cursorPosition, currentElement) => {
+            const currentElementCoord = currentElement.getBoundingClientRect();
+            const currentElementCenter = currentElementCoord.x + currentElementCoord.width / 2;
+
+            const nextElement   = (cursorPosition < currentElementCenter)
+                                ? currentElement
+                                : currentElement.nextElementSibling;
+
+            return nextElement;
+        };
+
+        $('.gallery .img-thumbnail').off('dragover');
+        $('.gallery .img-thumbnail').on('dragover', (event)=>{
+            event.preventDefault();
+
+            const activeElement = $(`.dragging`)[0];
+            const currentElement = $(event.target);
+            const isMoveable = activeElement !== currentElement && currentElement.hasClass('img-thumbnail');
+            
+            if (!isMoveable) return;
+
+            const nextElement = getImgNextElement(event.clientX, event.target);
+
+            if ((nextElement && activeElement === nextElement.previousElementSibling) || (activeElement === nextElement)) {
+                return;
+            }
+            
+            if (nextElement) {
+                nextElement.before(activeElement);
+            }
+            else {
+                $('.gallery .img-thumbnail').last().after(activeElement);
+            }
+        });
     }
 
     MakePanelKeys() {
@@ -311,13 +379,18 @@ class AdminCatalog {
             // currentElement.nextElementSibling :
             // currentElement;
 
-            const nextElement = getCardNextElement(event.clientY, event.target);
+            const nextElement = getCardNextElement(event.clientX, event.target);
 
             if ((nextElement && activeElement === nextElement.previousElementSibling) || (activeElement === nextElement)) {
                 return;
             }
             
-            nextElement.before(activeElement);
+            if (nextElement) {
+                nextElement.before(activeElement);
+            }
+            else {
+                $('.category-card').last().after(activeElement);
+            }
         });
         // #endregion
 
@@ -335,57 +408,58 @@ class AdminCatalog {
                 success: response => {
                     const categoryInfo = JSON.parse(response).data[0];
 
-                    $('#catalogModal #category_name').val(categoryInfo.category_name);
+                    $('#catalogWindow #category_name').val(categoryInfo.category_name);
+                    $('.catalog-go-link').show();
         
-                    $('#catalogModal').modal('toggle');
+                    $('#catalogWindow').offcanvas('show');
                     
-                    $('#catalogModal .accordion-body').collapse('hide');
+                    $('#catalogWindow .accordion-body').collapse('hide');
         
                     if (!$('button#catalog_list_header').hasClass('collapsed')){
                         $('button#catalog_list_header').trigger('click');
                     }
         
-                    $('#catalogModal').attr('parent_id', categoryInfo.parent_id);
-                    $('#catalogModal').attr('category_id', categoryInfo.category_id);
-                    $('#catalogModal .list-group .list-group-item').removeClass('active');
+                    $('#catalogWindow').attr('parent_id', categoryInfo.parent_id);
+                    $('#catalogWindow').attr('category_id', categoryInfo.category_id);
+                    $('#catalogWindow .list-group .list-group-item').removeClass('active');
 
-                    $('#catalogModal #category_url').val(categoryInfo.url);
-                    $('#catalogModal #categoryDescription').val(categoryInfo.description);
+                    $('#catalogWindow #category_url').val(categoryInfo.url);
+                    $('#catalogWindow #categoryDescription').val(categoryInfo.description);
         
-                    $(`#catalogModal .list-group .list-group-item[category_id="${categoryInfo.parent_id}"]`).addClass('active');
-                    $(`#catalogModal .list-group .list-group-item[category_id="${categoryInfo.category_id}"]`).remove();
+                    $(`#catalogWindow .list-group .list-group-item[category_id="${categoryInfo.parent_id}"]`).addClass('active');
+                    $(`#catalogWindow .list-group .list-group-item[category_id="${categoryInfo.category_id}"]`).remove();
         
-                    $('#catalogModal #activityChecked').prop('checked', categoryInfo.category_active == '1' ? true : false);
+                    $('#catalogWindow #activityChecked').prop('checked', categoryInfo.category_active == '1' ? true : false);
 
-                    const categoryName = $(`#catalogModal .list-group .list-group-item.active`).prop('innerHTML');
+                    const categoryName = $(`#catalogWindow .list-group .list-group-item.active`).prop('innerHTML');
                     const newName = $('#catalog_list_header').prop('innerHTML').split('-')[0] + ' - ' + categoryName.toLowerCase();
                     $('#catalog_list_header').prop('innerHTML', newName);
         
-                    $('#catalogModal .list-group .list-group-item').off('click');
-                    $('#catalogModal .list-group .list-group-item').on('click', (event)=>{
-                        $('#catalogModal .list-group .list-group-item').removeClass('active');
+                    $('#catalogWindow .list-group .list-group-item').off('click');
+                    $('#catalogWindow .list-group .list-group-item').on('click', (event)=>{
+                        $('#catalogWindow .list-group .list-group-item').removeClass('active');
                         $(event.target).addClass('active');
         
-                        const categoryName = $(`#catalogModal .list-group .list-group-item.active`).prop('innerHTML');
+                        const categoryName = $(`#catalogWindow .list-group .list-group-item.active`).prop('innerHTML');
                         const newName = $('#catalog_list_header').prop('innerHTML').split('-')[0] + ' - ' + categoryName.toLowerCase();
                         $('#catalog_list_header').prop('innerHTML', newName);
                     });
 
-                    $('#catalogModal #accept-button').off('click');
-                    $('#catalogModal #accept-button').on('click', ()=>{
+                    $('#catalogWindow #catalog-accept-button').off('click');
+                    $('#catalogWindow #catalog-accept-button').on('click', ()=>{
                         $.ajax({
                             url: `/admin/category/save/${categoryInfo.category_id}`,
                             type : "PUT",
                             data: {
                                 _token          : $('meta[name="csrf-token"]').attr('content'),
-                                parent_id       : $(`#catalogModal .list-group .list-group-item.active`).attr('category_id'), 
-                                category_active : $('#catalogModal #activityChecked').prop('checked') ? '1' : '0', 
-                                category_name   : $('#catalogModal #category_name').val(),
-                                url             : $('#catalogModal #category_url').val(),
-                                description     : $('#catalogModal #categoryDescription').val(),
+                                parent_id       : $(`#catalogWindow .list-group .list-group-item.active`).attr('category_id'), 
+                                category_active : $('#catalogWindow #activityChecked').prop('checked') ? '1' : '0', 
+                                category_name   : $('#catalogWindow #category_name').val(),
+                                url             : $('#catalogWindow #category_url').val(),
+                                description     : $('#catalogWindow #categoryDescription').val(),
                             },
                             success: response => {
-                                $('#catalogModal').modal('toggle');
+                                $('#catalogWindow').offcanvas('hide');
                                 console.debug('Saved', response);
                                 this.UpdateList();
                             },
@@ -472,11 +546,29 @@ class AdminCatalog {
         });
 
         $('.table-item .column-name').off('click');
-        $('.table-item .column-name').on('click', (event)=>{
+        $('.table-item .column-name').on('click', async (event)=>{
             const itemId = $(event.target).parent().attr('item-id');
             $('.base-data').val('');
             $('#productEdit').offcanvas('show');
             $('#productEdit').attr('item-id', itemId);
+
+            const loadView = new Promise((resolve, reject) => {
+                $.ajax({
+                    url: `/admin/product/edit/form`,
+                    type : "POST",
+                    data: { _token : $('meta[name="csrf-token"]').attr('content'), },
+                    success : (response) => {
+
+                        const newFormBody = $(response).find('.offcanvas-body');
+                        $('#productEdit .offcanvas-body').replaceWith(newFormBody);
+            
+                        resolve();
+                    },
+                    error : (e)=>{reject()}
+                });
+            });
+    
+            await loadView;
 
             $.ajax({
                 url: `/admin/products/info/${itemId}`,
@@ -486,7 +578,7 @@ class AdminCatalog {
                     const item = JSON.parse(response).data[0];
                     $('#productEdit #productName').prop('innerHTML', item['Наименование']);
 
-                    console.debug(`Товар с id - ${itemId}`, item);
+                    // console.debug(`Товар с id - ${itemId}`, item);
                     $('#productEdit .base-data').each((index, element) => {
                         const nodeName = $(element).prop('nodeName');
                         const bdColumn = $(element).attr('bd-column');
@@ -509,13 +601,19 @@ class AdminCatalog {
 
                     $('#accordionImages .gallery').empty();
                     const photos = item['Фото товара'].split(';');
-                    for(const photo of photos){
-                        const photoName = photo.split('.')[0];
-                        const photoExt = photo.split('.')[1];
-                        const photoURL = `https://leger.market/pictures/product/small/${photoName}_small.${photoExt}`;
-                        $('#accordionImages .gallery').append(`
-                            <img src="${photoURL}" class="img-thumbnail shadow m-2" draggable="true" style="width: 150px; height: 150px;"/>
-                        `);
+                    if (photos.length > 0 && photos[0] != ""){
+                        for(const photo of photos){
+                            const photoName = photo.split('.')[0];
+                            const photoExt = photo.split('.')[1];
+                            if (photoName && photoExt) {
+                                const photoURL = `https://leger.market/pictures/product/small/${photoName}_small.${photoExt}`;
+                                $('#accordionImages .gallery').append(`
+                                    <img src="${photoURL}" baseURL="${photo}" class="img-thumbnail shadow m-2" draggable="true" style="width: 150px; height: 150px;"/>
+                                `);
+                            }
+                        }
+
+                        this.ProductGalleryKeys();
                     }
                 },
                 error: (e)=>console.warn('error', e),
@@ -582,19 +680,18 @@ class AdminCatalog {
             window.open(link);
         });
 
-
-        $('#catalogModal .link').off('click');
-        $('#catalogModal .link').on('click', function() {
-            const link = $(this).parent().parent().find('input').val();
+        $('.catalog-go-link').off('click');
+        $('.catalog-go-link').on('click', function() {
+            const link = $('#catalogWindow #category_url').val();
             window.open(`/products/${link}`);
         });
 
     }
 
     MakeCatalogModalKeys() {
-        //#region catalogModal functions
-        $('#catalogModal .translate').off('click');
-        $('#catalogModal .translate').on('click', () => {
+        //#region catalogWindow functions
+        $('#catalogWindow .translate').off('click');
+        $('#catalogWindow .translate').on('click', () => {
             const categoryName = $('#category_name').val();
             if (categoryName != ''){
                 const url = translit(categoryName);
@@ -602,20 +699,20 @@ class AdminCatalog {
             }
         });
 
-        $('#catalogModal .list-group .list-group-item').off('click');
-        $('#catalogModal .list-group .list-group-item').on('click', (event)=>{
-            $('#catalogModal .list-group .list-group-item').removeClass('active');
+        $('#catalogWindow .list-group .list-group-item').off('click');
+        $('#catalogWindow .list-group .list-group-item').on('click', (event)=>{
+            $('#catalogWindow .list-group .list-group-item').removeClass('active');
             $(event.target).addClass('active');
 
-            const categoryName = $(`#catalogModal .list-group .list-group-item.active`).prop('innerHTML');
+            const categoryName = $(`#catalogWindow .list-group .list-group-item.active`).prop('innerHTML');
             const newName = $('#catalog_list_header').prop('innerHTML').split('-')[0] + ' - ' + categoryName.toLowerCase();
             $('#catalog_list_header').prop('innerHTML', newName);
         });
 
-        $('#catalogModal #accept-button').off('click');
-        $('#catalogModal #accept-button').on('click', ()=>{
-            const categoryName = $('#catalogModal #category_name').val();
-            const categoryParent = $(`#catalogModal .list-group .list-group-item.active`).attr('category_id');
+        $('#catalogWindow #catalog-accept-button').off('click');
+        $('#catalogWindow #catalog-accept-button').on('click', ()=>{
+            const categoryName = $('#catalogWindow #category_name').val();
+            const categoryParent = $(`#catalogWindow .list-group .list-group-item.active`).attr('category_id');
 
             $.ajax({
                 url: "/admin/categories/new",
@@ -623,14 +720,14 @@ class AdminCatalog {
                 data: {
                     _token          : $('meta[name="csrf-token"]').attr('content'),
                     parent_id       : categoryParent, 
-                    category_active : $('#catalogModal #activityChecked').prop('checked') ? '1' : '0', 
+                    category_active : $('#catalogWindow #activityChecked').prop('checked') ? '1' : '0', 
                     category_name   : categoryName,
-                    url             : $('#catalogModal #category_url').val(),
-                    description     : $('#catalogModal #categoryDescription').val(),
+                    url             : $('#catalogWindow #category_url').val(),
+                    description     : $('#catalogWindow #categoryDescription').val(),
                 },
                 success: response => {
                     const id = JSON.parse(response).id;
-                    $('#catalogModal').modal('toggle');
+                    $('#catalogWindow').offcanvas('hide');
                     
                     const itemHTML = `
                         <div class="item-wrapper category-item d-flex flex-column">
@@ -657,10 +754,10 @@ class AdminCatalog {
     }
 
     MakeProductModalKeys() {
-        //#region productModal functions
-        $('#productModal .list-group .list-group-item').off('click');
-        $('#productModal .list-group .list-group-item').on('click', (event)=>{
-            $('#productModal .list-group .list-group-item').removeClass('active');
+        //#region productsList functions
+        $('#productsList .list-group .list-group-item').off('click');
+        $('#productsList .list-group .list-group-item').on('click', (event)=>{
+            $('#productsList .list-group .list-group-item').removeClass('active');
             $(event.target).addClass('active');
 
             const categoryName = $(`#items-catalog .item-label.selected`).prop('innerHTML');
@@ -669,9 +766,9 @@ class AdminCatalog {
             $('#parentCatalog').prop('innerHTML', categoryName.toLowerCase());
         });
 
-        $('#productModal #accept-button').off('click');
-        $('#productModal #accept-button').on('click', ()=>{
-            const categoryParent = $(`#productModal .list-group .list-group-item.active`).attr('category_id');
+        $('#productsList #product-accept-button').off('click');
+        $('#productsList #product-accept-button').on('click', ()=>{
+            const categoryParent = $(`#productsList .list-group .list-group-item.active`).attr('category_id');
             console.debug('accept', categoryParent);
 
             const checkedList = $('.column-check input[item-id]:checked');
@@ -696,17 +793,17 @@ class AdminCatalog {
                 success: response => {
                     // console.debug(response);
                     this.UpdateList();
-                    $('#productModal').modal('toggle');
+                    $('#productsList').offcanvas('hide');
                 },
                 error: (e)=>console.warn('error', e),
             });
         });
 
-        $('#productModal #table-header-check').off('input');
-        $('#productModal #table-header-check').on('input', ()=>{
-            const headerCheck = $(`#productModal #table-header-check`).prop('checked');
+        $('#productsList #table-header-check').off('input');
+        $('#productsList #table-header-check').on('input', ()=>{
+            const headerCheck = $(`#productsList #table-header-check`).prop('checked');
             console.debug(headerCheck);
-            const checkedList = $('#productModal .column-check input[item-id]');
+            const checkedList = $('#productsList .column-check input[item-id]');
             checkedList.each((index, element)=>{
                 const productId = $(element).attr('item-id');
                 if (productId != undefined){
@@ -715,10 +812,10 @@ class AdminCatalog {
             });
         });
 
-        $('#productEdit .link').off('click');
-        $('#productEdit .link').on('click', function() {
-            const link = $(this).parent().parent().find('input').val();
-            window.open(`/product/${link}`);
+        $('.product-go-link').off('click');
+        $('.product-go-link').on('click', function() {
+            const link = $('#productEdit input[bd-column="URL адрес"]').val();
+            if (link) window.open(`/product/${link}`);
         });
 
         $('#productEdit .translate').off('click');
@@ -733,7 +830,7 @@ class AdminCatalog {
         $('#productEdit #product-save-button').off('click');
         $('#productEdit #product-save-button').on('click', () => {
             const itemId = $('#productEdit').attr('item-id');
-            console.debug(itemId);
+            // console.debug(itemId);
             
             const savedData = new Map();
             $('#productEdit .base-data').each((index, element) => {
@@ -749,6 +846,13 @@ class AdminCatalog {
                 }
             });
 
+            let photos = [];
+            $('.gallery .img-thumbnail').each((index, element) => {
+                photos.push($(element).attr('baseUrl'));
+            });
+
+            savedData.set('Фото товара', photos.join(';'));
+
             $.ajax({
                 url: `/admin/products/save/${itemId}`,
                 type : "PUT",
@@ -757,7 +861,7 @@ class AdminCatalog {
                     savedData : Array.from(savedData),
                 },
                 success: response => {
-                    console.debug(JSON.parse(response));
+                    // console.debug(JSON.parse(response));
                     messages.Success('Данные сохранены успешно.');
                     $('#productEdit').offcanvas('hide');
                     this.UpdateWorkPanel();
@@ -1074,6 +1178,109 @@ class AdminCatalog {
 
 }
 
+class AdminProperties {
+
+    // непустые SELECT * FROM `catalog` WHERE `catalog`.`Свойство: Ширина` IS NOT NULL AND `catalog`.`Свойство: Ширина` <> ''
+    // переименовать столбец ALTER TABLE `catalog` CHANGE `Цена` `Цена2` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;
+    // вставка столбца ALTER TABLE `catalog` ADD `Свойство: новое` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `Свойство: Цена`;
+
+    constructor() {
+        console.log(this.constructor.name);
+        this.token = $('meta[name="csrf-token"]').attr('content');
+        this.MakeKeys();
+    }
+
+    MakeKeys() {
+
+        // #region item dragging functions
+        $('.table-property-item').attr('draggable', 'true');
+
+        $('.table-property-item').off('mousedown');
+        $('.table-property-item').on('mousedown', (event)=>{
+            if ($(event.target).hasClass('item-drag')){
+                this._itemStartDragg = true;
+            }
+        });
+
+        $('.table-property-item').off('dragstart');
+        $('.table-property-item').on('dragstart', (event)=>{
+            if (!this._itemStartDragg){
+                event.preventDefault();
+                return;
+            }
+
+            $(event.target).addClass(`dragging`);
+        });
+
+        $('.table-property-item').off('dragend');
+        $('.table-property-item').on('dragend', (event)=>{
+            $(event.target).removeClass(`dragging`);
+            this._itemStartDragg = false;
+            this.UpdatePropertiesOrders();
+        });
+
+        const getItemNextElement = (cursorPosition, currentElement) => {
+            const currentElementCoord = currentElement.getBoundingClientRect();
+            const currentElementCenter = currentElementCoord.y + currentElementCoord.height / 2;
+
+            const nextElement   = (cursorPosition < currentElementCenter)
+                                ? currentElement
+                                : currentElement.nextElementSibling;
+
+            return nextElement;
+        };
+
+        $('.table-property-item').off('dragover');
+        $('.table-property-item').on('dragover', (event)=>{
+            event.preventDefault();
+
+            const activeElement = $(`.dragging`)[0];
+            const currentElement = $(event.target);
+            const isMoveable = activeElement !== currentElement && currentElement.hasClass('table-property-item');
+              
+            if (!isMoveable) {
+              return;
+            }
+
+            const nextElement = getItemNextElement(event.clientY, event.target);
+
+            if ((nextElement && activeElement === nextElement.previousElementSibling) || (activeElement === nextElement)) {
+                return;
+            }
+            
+            if (nextElement) {
+                nextElement.before(activeElement);
+            }
+            else {
+                $('.table-property-item').last().after(activeElement);
+            }
+
+        });
+        // #endregion
+
+    }
+
+    UpdatePropertiesOrders() {
+        const orders = [];
+        $('.table-property-item').each((index, element) => {
+            const id = $(element).attr('item-id');
+            orders.push({id : id, index : index});
+        });
+
+        $.ajax({
+            url: "/admin/properties/orders",
+            type : "PUT",
+            data: { orders : orders, },
+            success: response => {
+                // this.UpdateList(false);
+            },
+            error: (e)=>console.warn('error', e),
+        });
+    }
+
+
+}
+
 class AdminPanel {
 
     _cardStartDragg = false;
@@ -1090,6 +1297,7 @@ class AdminPanel {
         this.MakeKeys();
         
         new AdminCatalog();
+        new AdminProperties();
 
         // #region test
 
@@ -1152,6 +1360,8 @@ class AdminPanel {
             },
             error   : e => console.debug("Ошибка", e)
         });
+
+        messages.Success('Добро пожаловать.');
 
     }
 

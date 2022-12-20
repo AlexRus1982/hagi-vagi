@@ -227,4 +227,21 @@ class WebController extends Controller
     #endregion
     //----------------------------------------------------------------------------------
     
+
+    //----------------------------------------------------------------------------------
+    #region properties
+    public function SetPropertiesOrder(Request $request) {
+        foreach ($request->orders as $order) {
+            DB::table('properties')
+            ->where('id', $order['id'])
+            ->update([
+                'order_place' => $order['index']
+            ]);
+        }
+        return '{"server_answer" : "success"}';
+    }
+
+    #endregion
+    //----------------------------------------------------------------------------------
+
 }
