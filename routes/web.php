@@ -63,11 +63,15 @@ Route::prefix('admin')->group(function(){
 
     Route::prefix('properties')->group(function(){
         // Route::get   ('/check', 'WebController@PropertiesCheck')->name('properties.check');
-        // Route::get   ('/info/{id}', 'WebController@ProductInfo')->name('products.productInfo');
+        Route::get   ('/list', 'WebController@PropertiesList')->name('properties.list');
+        Route::get   ('/values', 'WebController@PropertiesValuesList')->name('properties.valuesList');
+        Route::get   ('/valuesForm', 'WebController@PropertiesValuesForm')->name('properties.valuesForm');
         Route::put   ('/orders', 'WebController@SetPropertiesOrder')->name('properties.order');
-        // Route::get   ('/parent/{id}', 'WebController@ItemsForParent')->name('products.forparent');
-        // Route::put   ('/add', 'WebController@ProductsAddToCategory')->name('products.add_to_category');
-        // Route::delete('/category/delete', 'WebController@ProductsDeleteFromCategory')->name('products.delete_from_category');
+        Route::put   ('/add', 'WebController@AddProperty')->name('properties.add');
+        Route::put   ('/rename', 'WebController@RenameProperty')->name('properties.rename');
+        Route::put   ('/filter/{id}', 'WebController@PropertySetFilter')->name('properties.inFilter');
+        Route::put   ('/card/{id}', 'WebController@PropertySetCard')->name('properties.inCard');
+        Route::delete('/delete', 'WebController@DelProperty')->name('properties.del');
     });
 
     Route::delete('/product/category/delete', 'WebController@ProductDeleteFromCategory')->name('product.delete_from_category');

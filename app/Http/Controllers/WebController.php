@@ -230,6 +230,15 @@ class WebController extends Controller
 
     //----------------------------------------------------------------------------------
     #region properties
+    /** получение списка свойств
+     */
+    public function PropertiesList() {
+        return view('admin.includes.tabs.tab_properties');
+    }
+
+    /** изменение порядка
+     *  порядок $request->orders
+     */
     public function SetPropertiesOrder(Request $request) {
         foreach ($request->orders as $order) {
             DB::table('properties')
@@ -241,6 +250,153 @@ class WebController extends Controller
         return '{"server_answer" : "success"}';
     }
 
+    /** вставка нового столбца
+     *  вставка столбца - ALTER TABLE `catalog` ADD `Свойство: новое` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `Свойство: Цена`;
+     *  имя нового столбца $request->newName
+     */
+    public function AddProperty(Request $request) {
+
+        $columnNames = DB::getSchemaBuilder()
+        ->getColumnListing('catalog');
+
+        $properties = [];
+
+        foreach($columnNames as $columnName){
+            if (mb_strpos($columnName, 'Свойство: ') !== false){
+                $properties[] = $columnName;
+            }
+        }
+
+        if (in_array($request->newName, $properties)) {
+            return response()->json([
+                "server_answer" => "error",
+                "error_type" => "Такое свойство уже есть !!!",
+            ]);
+        }
+
+        $lastProperty = end($properties);
+        $sqlRequest = "ALTER TABLE `catalog` ADD `{$request->newName}` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `{$lastProperty}`";
+
+        DB::statement($sqlRequest);
+
+        return response()->json([
+            "server_answer" => "success",
+            "last_name" => $lastProperty,
+        ]);
+    }
+
+    /** удаление столбца
+     *  удаление столбца - ALTER TABLE `catalog` DROP `Свойство: Тест`;
+     *  имя удаляемого столбца $request->columnName
+     */
+    public function DelProperty(Request $request) {
+        $columnNames = DB::getSchemaBuilder()
+        ->getColumnListing('catalog');
+
+        if (!in_array($request->columnName, $columnNames)) {
+            return response()->json([
+                "server_answer" => "error",
+                "error_type" => "Нет такого свойства !!!",
+            ]);
+        }
+
+
+        $sqlRequest = "ALTER TABLE `catalog` DROP `{$request->columnName}`";
+        DB::statement($sqlRequest);
+
+        DB::table('properties')
+        ->where('column_name', $request->columnName)
+        ->delete();
+
+        return response()->json([
+            "server_answer" => "success",
+        ]);
+    }
+
+    /** переименование столбца
+     *  переименование столбца - ALTER TABLE `catalog` CHANGE `Цена` `Цена2` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;
+     *  старое имя столбца $request->columnName
+     *  новое имя столбца $request->newName
+     */
+    public function RenameProperty(Request $request) {
+        $columnNames = DB::getSchemaBuilder()
+        ->getColumnListing('catalog');
+
+        if (!in_array($request->columnName, $columnNames)) {
+            return response()->json([
+                "server_answer" => "error",
+                "error_type" => "Нет такого свойства !!!",
+            ]);
+        }
+
+        $sqlRequest = "ALTER TABLE `catalog` CHANGE `{$request->columnName}` `{$request->newName}` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL";
+        DB::statement($sqlRequest);
+
+        DB::table('properties')
+        ->where('column_name', $request->columnName)
+        ->update([
+            'column_name' => $request->newName, 
+        ]);
+
+        return response()->json([
+            "server_answer" => "success",
+        ]);
+    }
+
+    /** показать в фильтре
+     *  $id - ид записи своства
+     *  $request->inFilter - "1" или "0"
+     */
+    public function PropertySetFilter($id, Request $request) {
+        DB::table('properties')
+        ->where('id', $id)
+        ->update([
+            'in_filtr' => $request->inFilter, 
+        ]);
+
+        return response()->json([
+            "server_answer" => "success",
+        ]);
+    }
+
+    /** показать в карточке товара
+     *  @param $id - ид записи своства
+     *  @param $request->inCard - "1" или "0"
+     */
+    public function PropertySetCard($id, Request $request) {
+        DB::table('properties')
+        ->where('id', $id)
+        ->update([
+            'in_card' => $request->inCard, 
+        ]);
+
+        return response()->json([
+            "server_answer" => "success",
+        ]);
+    }
+
+    /** получить список уникальных значений свойства
+     *  @param $request->columnName - "1" или "0"
+     */
+    public function PropertiesValuesList(Request $request) {
+        $used = DB::table('catalog')
+        ->where([
+            [$request->columnName, '<>', 'NULL'],
+            [$request->columnName, '<>', ''],
+        ])->get();
+
+        return response()->json([
+            "server_answer" => "success",
+            "values" => $used,
+        ]);
+    }
+
+    /** получить форму уникальных значений свойства
+     *  @param $request->propertyName
+     */
+    public function PropertiesValuesForm(Request $request) {
+        return view('admin.includes.offcanvas.property_values', ['propertyName' => $request->propertyName]);
+    }
     #endregion
     //----------------------------------------------------------------------------------
 

@@ -136,7 +136,7 @@
                         ->get();
 
                         foreach($properties as $property){
-                            $propertyName  = str_replace('Свойство: ' ,'' , $property->column_name);
+                            $propertyName  = str_replace('Свойство: ', '', $property->column_name);
                             array_push($columns, $propertyName);
                         }
                     ?>

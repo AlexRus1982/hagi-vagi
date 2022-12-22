@@ -1180,9 +1180,11 @@ class AdminCatalog {
 
 class AdminProperties {
 
-    // непустые SELECT * FROM `catalog` WHERE `catalog`.`Свойство: Ширина` IS NOT NULL AND `catalog`.`Свойство: Ширина` <> ''
-    // переименовать столбец ALTER TABLE `catalog` CHANGE `Цена` `Цена2` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;
-    // вставка столбца ALTER TABLE `catalog` ADD `Свойство: новое` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `Свойство: Цена`;
+    // непустые - SELECT * FROM `catalog` WHERE `catalog`.`Свойство: Ширина` IS NOT NULL AND `catalog`.`Свойство: Ширина` <> ''
+    // переименовать столбец - ALTER TABLE `catalog` CHANGE `Цена` `Цена2` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;
+    // вставка столбца - ALTER TABLE `catalog` ADD `Свойство: новое` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `Свойство: Цена`;
+    // удаление столбца - ALTER TABLE `catalog` DROP `Свойство: Тест`;
+
 
     constructor() {
         console.log(this.constructor.name);
@@ -1191,6 +1193,7 @@ class AdminProperties {
     }
 
     MakeKeys() {
+        const that = this;
 
         // #region item dragging functions
         $('.table-property-item').attr('draggable', 'true');
@@ -1258,6 +1261,137 @@ class AdminProperties {
         });
         // #endregion
 
+        $('.add-property').off('click');
+        $('.add-property').on('click', function() {
+            $('#propertyEdit .property-go-link').hide();
+            $('#propertyEdit').offcanvas('show');
+            $('#propertyEdit').attr('item-id', '-1');
+            $('#propertyName').prop('innerHTML', '...');
+            $('#propertyNameInput').val('');
+        });
+
+        $('.property-edit').off('click');
+        $('.property-edit').on('click', function() {
+            $('#propertyEdit .property-go-link').show();
+            $('#propertyEdit').offcanvas('show');
+            const item = $(this).parent().parent();
+            
+            const itemId = item.attr('item-id');
+            $('#propertyEdit').attr('item-id', itemId);
+
+            const itemName = item.find('.property-name').prop('innerHTML');
+            $('#propertyName').prop('innerHTML', itemName);
+            $('#propertyNameInput').val(itemName);
+
+            console.debug(itemId, itemName);
+        });
+
+        $('.property-delete').off('click');
+        $('.property-delete').on('click', function() {
+            const item = $(this).parent().parent();
+            const itemName = item.find('.property-name').prop('innerHTML');
+            if (confirm('Удалить свойство?')) {
+                $.ajax({
+                    url: "/admin/properties/delete",
+                    type : "DELETE",
+                    data: { columnName : `Свойство: ${itemName}`, },
+                    success: response => that.UpdatePropertiesList(),
+                    error: (e)=>console.warn('error', e),
+                });
+            }
+        });
+
+        $('.property-list').off('click');
+        $('.property-list').on('click', function() {
+            const item = $(this).parent().parent();
+            const itemName = item.find('.property-name').prop('innerHTML');
+            console.debug(`Найдем все "Свойство: ${itemName}"`);
+
+            $.ajax({
+                url: "/admin/properties/valuesForm",
+                type : "GET",
+                data: { propertyName : `Свойство: ${itemName}`, },
+                success: response => {
+                    
+                    const newHeader = $(response).find('.offcanvas-header');
+                    $('#propertyValues .offcanvas-header').replaceWith(newHeader);
+
+                    const newBody = $(response).find('.offcanvas-body');
+                    $('#propertyValues .offcanvas-body').replaceWith(newBody);
+
+                    // this.MakeKeys();
+                    $('#propertyValues').offcanvas('show');
+                },
+                error: (e)=>console.warn('error', e),
+            });
+        });
+
+        $('#property-save-button').off('click');
+        $('#property-save-button').on('click', function() {
+            const propertyName = $('#propertyNameInput').val();
+            if (propertyName == ''){
+                $('#propertyEdit').offcanvas('hide');
+            }
+
+            const itemId = $('#propertyEdit').attr('item-id');
+            console.debug(itemId);
+            if (itemId == '-1') {
+                $.ajax({
+                    url: "/admin/properties/add",
+                    type : "PUT",
+                    data: { newName : `Свойство: ${propertyName}`, },
+                    success: response => {
+                        $('#propertyEdit').offcanvas('hide');
+                        that.UpdatePropertiesList();
+                    },
+                    error: (e)=>console.warn('error', e),
+                });
+            }
+            else {
+                const oldName = $('#propertyName').prop('innerHTML');
+                $.ajax({
+                    url: "/admin/properties/rename",
+                    type : "PUT",
+                    data: { 
+                        columnName : `Свойство: ${oldName}`,
+                        newName    : `Свойство: ${propertyName}`, 
+                    },
+                    success: response => {
+                        $('#propertyEdit').offcanvas('hide');
+                        that.UpdatePropertiesList();
+                    },
+                    error: (e)=>console.warn('error', e),
+                });
+            }
+        });
+
+        $('.table-property-item .property-show-filter input').off('input');
+        $('.table-property-item .property-show-filter input').on('input', function(){
+            const item = $(this).parent().parent().parent();
+            const itemId = item.attr('item-id');
+            const check = $(this).prop('checked');
+            $.ajax({
+                url: `/admin/properties/filter/${itemId}`,
+                type : "PUT",
+                data: { inFilter : (check) ? "1" : "0", },
+                success: response => {},
+                error: (e)=>console.warn('error', e),
+            });
+        });
+
+        $('.table-property-item .property-show-card input').off('input');
+        $('.table-property-item .property-show-card input').on('input', function(){
+            const item = $(this).parent().parent().parent();
+            const itemId = item.attr('item-id');
+            const check = $(this).prop('checked');
+            $.ajax({
+                url: `/admin/properties/card/${itemId}`,
+                type : "PUT",
+                data: { inCard : (check) ? "1" : "0", },
+                success: response => {},
+                error: (e)=>console.warn('error', e),
+            });
+        });
     }
 
     UpdatePropertiesOrders() {
@@ -1278,6 +1412,18 @@ class AdminProperties {
         });
     }
 
+    UpdatePropertiesList() {
+        $.ajax({
+            url: "/admin/properties/list",
+            type : "GET",
+            success: response => {
+                const newList = $(response).find('.table-items-body');
+                $('#nav-properties .table-items-body').replaceWith(newList);
+                this.MakeKeys();
+            },
+            error: (e)=>console.warn('error', e),
+        });
+    }
 
 }
 

@@ -453,6 +453,7 @@ html * {
 
 .product-go-link,
 .catalog-go-link,
+.property-go-link,
 #category-go-link {
     transform: scaleX(-1.0);
     transition: 0.3s;
@@ -460,6 +461,7 @@ html * {
 
 .product-go-link:hover,
 .catalog-go-link:hover,
+.property-go-link:hover,
 #category-go-link:hover {
     cursor: pointer;
     transform: scaleX(-1.0) scale(1.3);

@@ -1,4 +1,4 @@
-<div class="toast-container position-fixed bottom-0 start-0 p-3" style="opacity: 1.0; z-index: 1000000; padding-bottom: 40px !important;">
+<div class="toast-container position-fixed bottom-0 start-0 p-3" style="opacity: 0.8; z-index: 1000000; padding-bottom: 10px !important;">
 </div>
 
 <style>
