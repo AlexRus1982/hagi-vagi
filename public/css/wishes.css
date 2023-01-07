@@ -1,4 +1,4 @@
-.basket-icon {
+.wishes-icon {
     width: 60px;
     height: 60px;
     opacity: 0.8;
@@ -14,21 +14,21 @@
     box-shadow: 0px 0px 10px #00000000;
 }
 
-.basket-icon.hidden {
+.wishes-icon.hidden {
     display: none;
 }
 
-.basket-icon:hover {
+.wishes-icon:hover {
     cursor: pointer;
     transform: scale(1.2);
     box-shadow: 0px 0px 10px #0000007F;
 }
 
-.basket-icon:hover .basket-count {
+.wishes-icon:hover .wishes-count {
     box-shadow: 0px 0px 10px #0000007F;
 }
 
-.basket-count {
+.wishes-count {
     position: absolute;
     font-size: 12px;
     font-weight: 600;

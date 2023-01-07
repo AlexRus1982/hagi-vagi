@@ -10,9 +10,22 @@
     <body>
         Test page<br>
         <?php
+            $cookieUuid = Cookie::get('cookie-uuid');
+            
+            $list = DB::table('wish_list')
+            ->where('cookie_uuid', $cookieUuid)
+            ->select('product_id')
+            ->get();
+            
+            $wishList = [];
+            foreach ($list as $item) {
+                array_push($wishList, $item->product_id);
+            }
 
-            $cookieUuid = json_encode(Cookie::get());
-            echo "cookie read = {$cookieUuid}<br>";
+            dd($wishList);
+
+            // $cookieUuid = json_encode(Cookie::get());
+            // echo "cookie read = {$cookieUuid}<br>";
 
             // $propertyName = "Свойство: Материал";
             // $propertyArray = [];

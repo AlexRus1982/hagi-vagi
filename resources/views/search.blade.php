@@ -3,6 +3,19 @@
 @section('page.title', 'Результат поиска')
 
 @section('content')
+    <?php
+        $cookieUuid = Cookie::get('cookie-uuid');
+                
+        $list = DB::table('wish_list')
+        ->where('cookie_uuid', $cookieUuid)
+        ->select('product_id')
+        ->get();
+        
+        $wishList = [];
+        foreach ($list as $item) {
+            array_push($wishList, $item->product_id);
+        }
+    ?>
 
     <div class="container d-flex justify-content-start flex-wrap" style="max-width: 1200px;">
 

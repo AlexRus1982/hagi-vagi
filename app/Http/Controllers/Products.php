@@ -81,6 +81,43 @@ class Products extends Controller
         }
     }
 
+    public function wished(Request $request){
+        $item = DB::table('wish_list')
+        ->where('product_id', $request->product_id)
+        ->where('cookie_uuid', $request->cookie_uuid)
+        ->get();
+
+        if (count($item)){
+            return response()->json([ 'server-answer' => "wished product already exists." ]);
+        }
+        else {
+            DB::table('wish_list')
+            ->insert([
+                'product_id' => $request->product_id,
+                'cookie_uuid' => $request->cookie_uuid,
+            ]);
+            return response()->json([ 'server-answer' => "wished product added." ]);
+        }
+    }
+
+    public function wishedDelete(Request $request){
+        DB::table('wish_list')
+        ->where('product_id', $request->product_id)
+        ->where('cookie_uuid', $request->cookie_uuid)
+        ->delete();
+        return response()->json([ 'server-answer' => "wished deleted." ]);
+    }
+
+    public function wishedList() {
+        $cookieUuid = Cookie::get('cookie-uuid');
+        $list = DB::table('wish_list')
+        ->leftJoin('catalog', 'catalog.id', '=', 'wish_list.product_id')
+        ->where('wish_list.cookie_uuid', $cookieUuid)
+        ->get();
+
+        return response()->json([ 'wishedList' => $list ]);
+    }
+
     public function showCategory($url){
         $this->checkCookieUuid();
 

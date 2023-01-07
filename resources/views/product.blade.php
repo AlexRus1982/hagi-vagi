@@ -3,6 +3,20 @@
 @section('page.title', $product['Наименование'])
 
 @section('content')
+    <?php
+        $cookieUuid = Cookie::get('cookie-uuid');
+                
+        $list = DB::table('wish_list')
+        ->where('cookie_uuid', $cookieUuid)
+        ->select('product_id')
+        ->get();
+        
+        $wishList = [];
+        foreach ($list as $item) {
+            array_push($wishList, $item->product_id);
+        }
+    ?>
+
     <meta name="product-id" content="{{ $product['id'] }}">
     <div class="container d-flex justify-content-center flex-column align-self-center" style="align-items: center; max-width: 1200px;">
         

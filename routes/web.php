@@ -8,6 +8,9 @@ Route::get('/products/{url}', 'Products@showCategory')->name('category');
 
 Route::get('/product/{url}', 'Products@show')->name('product');
 Route::put('/visited', 'Products@visited')->name('product.visited');
+Route::put('/wished', 'Products@wished')->name('product.wished');
+Route::delete('/wished/delete', 'Products@wishedDelete')->name('product.wished.delete');
+Route::get('/wished/list', 'Products@wishedList')->name('product.wished.list');
 
 Route::get('/service/{url}', 'Services@show')->name('service');
 

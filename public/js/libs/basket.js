@@ -6,8 +6,10 @@ export class Basket {
     order_hash = null;
 
     constructor() {
-        if ($('.basket').length == 0) return;
+        $('.info-panel').append($('.basket-icon'));
         this.MakeKeys();
+        
+        if ($('.basket-icon').length == 0) return;
         this.UpdateBasket();
     }
 
@@ -28,9 +30,9 @@ export class Basket {
             console.warn(e);
         }
 
-        setInterval(()=>{
-            this.UpdateBasket();
-        }, 10000);
+        // setInterval(()=>{
+        //     this.UpdateBasket();
+        // }, 10000);
     }
 
     RenderList(list){
@@ -180,8 +182,17 @@ export class Basket {
     }
 
     MakeKeys(){
-        $('.basket').off('click');
-        $('.basket').on('click', ()=>{
+        $('.basketButton').off('click');
+        $('.basketButton').on('click', function(event){
+            const item_id = $(this).attr('item_id');
+            basket.AddItem(item_id);
+
+            event.stopPropagation();
+            event.preventDefault();
+        });
+
+        $('.basket-icon').off('click');
+        $('.basket-icon').on('click', ()=>{
             this.MakeList();
         });
 
@@ -268,10 +279,10 @@ export class Basket {
                 (data) => {
                     $('.basket-count')[0].innerHTML = data;
                     if (parseInt(data) > 0) {
-                        $('.basket').removeClass('hidden');
+                        $('.basket-icon').removeClass('hidden');
                     }
                     else {
-                        $('.basket').addClass('hidden');
+                        $('.basket-icon').addClass('hidden');
                     }
                 },
                 false

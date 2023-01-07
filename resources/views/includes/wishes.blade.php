@@ -1,25 +1,26 @@
-<div class="basket-icon hidden">
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16">
-        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+<div class="wishes-icon hidden mt-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
     </svg>
-    <div class="basket-count"></div>
+    <div class="wishes-count"></div>
 </div>
 
-<!-- Модальное окно корзины -->
-<div class="modal fade shadow" id="basketModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="basketModalLabel" aria-hidden="true">
+<!-- Модальное окно списка желаний -->
+<div class="modal fade shadow" id="wishesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="wishesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content p-1 shadow">
             <div class="modal-header bg-primary bg-gradient text-white">
-                <h5 class="modal-title" id="basketModalLabel">Корзина</h5>
+                <h5 class="modal-title" id="wishesModalLabel">Список желаний</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
             <div class="modal-body d-flex flex-nowrap flex-column">
                 
                 <!-- список товаров -->
-                <div id="orders-list"></div>
+                <div id="wishes-list"></div>
 
+                {{--
                 <!-- форма заказа -->
-                <ul class="nav nav-tabs pt-2" id="myTab" role="tablist">
+                <!-- <ul class="nav nav-tabs pt-2" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="simple-tab" data-bs-toggle="tab" data-bs-target="#simple-tab-pane" type="button" role="tab" aria-controls="simple-tab-pane" aria-selected="true">Быстрый заказ</button>
                     </li>
@@ -54,21 +55,24 @@
                     
                     <button id="order-button" type="button" class="w-100 btn btn-primary my-3">Заказать</button>
 
-                </div>
+                </div> -->
+                --}}
             </div>
             <div class="modal-footer d-flex flex-row flex-nowrap">
-                <div class="w-50 d-flex flex-nowrap">
+                <div class="w-50 d-flex flex-nowrap me-auto">
                     <div>Всего товаров:</div>
                     <div class="orderCount px-1">0</div>
                     <div class="px-0">шт.</div>
                 </div>
-                <div class="w-50 d-flex flex-nowrap justify-content-end">
+                {{--
+                <!-- <div class="w-50 d-flex flex-nowrap justify-content-end">
                     <div>Сумма заказа:</div>
                     <div class="orderSumm px-1">3380</div>
                     <svg style="margin: 5px 0px 0px 0px;" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8 21h2v-3h6v-2h-6v-2h4.5c2.757 0 5-2.243 5-5s-2.243-5-5-5H9a1 1 0 0 0-1 1v7H5v2h3v2H5v2h3v3zm2-15h4.5c1.654 0 3 1.346 3 3s-1.346 3-3 3H10V6z"></path>
                     </svg>
-                </div>
+                </div> -->
+                --}}
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
 <?php
     $cookieUuid = Cookie::get('cookie-uuid');
-    $list = DB::table('catalog')
-    ->leftJoin('visited_list', 'catalog.id', '=', 'visited_list.product_id')
+    $list = DB::table('visited_list')
+    ->leftJoin('catalog', 'catalog.id', '=', 'visited_list.product_id')
     ->where('visited_list.cookie_uuid', $cookieUuid)
     ->inRandomOrder()
     ->take(4)

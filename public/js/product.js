@@ -23,26 +23,6 @@ class ProductScript {
     }
 
     MakeKeys(){
-        $('.basketButton').off('click');
-        $('.basketButton').on('click', function(event){
-            const item_id = $(this).attr('item_id');
-            basket.AddItem(item_id);
-
-            event.stopPropagation();
-            event.preventDefault();
-        });
-
-        $('.wishButton').off('click');
-        $('.wishButton').on('click', function(event){
-            const item_id = $(this).attr('item_id');
-            // basket.AddItem(item_id);
-            // alert(`${item_id} - wish`);
-
-            $(this).toggleClass('wishset');
-
-            event.stopPropagation();
-            event.preventDefault();
-        });
     }
 
     MakeImages(){

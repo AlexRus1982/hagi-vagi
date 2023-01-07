@@ -1,7 +1,3 @@
-@php
-    makeGestId();
-@endphp
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,6 +24,7 @@
         <link href="/css/variables.css" rel="stylesheet">
         <link href="/css/footer.css" rel="stylesheet">
         <link href="/css/basket.css" rel="stylesheet">
+        <link href="/css/wishes.css" rel="stylesheet">
         
         @stack('css')
     </head>
@@ -35,7 +32,20 @@
     <body>
         @include('includes.preloader')
 
+        <div class="info-panel"></div>
+        <style>
+            .info-panel {
+                position: fixed;
+                top: 75px;
+                left: calc(100% - 80px);
+                display: flex;
+                flex-direction: column;
+                z-index: 1000;
+            }
+        </style>
+
         @include('includes.basket')
+        @include('includes.wishes')
 
         <div class="d-flex flex-column justify-content-between min-vh-100 text-center">
             @include('includes.header')
