@@ -4,8 +4,8 @@
 @endphp
 
 @if (count($photos) > 0)
-    <div id="carouselExampleControls" class="carousel carousel-dark slide w-100 start" data-bs-touch="true" data-bs-ride="carousel" style="max-width: 600px; height: 600px;">
-        <div class="carousel-inner border rounded-2 shadow mb-4 d-flex" style="height: 600px; align-items: center;">
+    <div id="carouselExampleControls" class="carousel carousel-dark slide w-100 {{--start--}} me-auto" data-bs-touch="true" data-bs-ride="carousel" style="max-width: 600px; height: 600px;">
+        <div class="carousel-inner border rounded-2 {{--shadow--}} mb-4 d-flex" style="height: 600px; align-items: center;">
 
             @php
                 $index = 1;

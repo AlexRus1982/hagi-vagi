@@ -3,13 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
 
 
 class Products extends Controller
 {
-    public function showAll(){
+    const cookieUuidLifeTime = 60 /* $minutes = 60 * 24 * 365 * 10; // 10 years */;
+
+    function checkCookieUuid() {
+        $cookieUuid = Cookie::get('cookie-uuid');
+        $uuid = ($cookieUuid != '') ? $cookieUuid : (string) Str::uuid();
+        Config::set('cookie-uuid', $uuid);
+    }
+
+    public function showMain(){
+        $this->checkCookieUuid();
+
+        return response()
+        ->view('main')
+        ->cookie('cookie-uuid', Config::get('cookie-uuid'), Products::cookieUuidLifeTime);
+    }
+
+    public function showAll(Request $request){
+        $this->checkCookieUuid();
+
+        Log::debug(json_encode($request->cookie()));
+
         $id = 0;
         $items = DB::table('catalog')
         ->join('hierarchy_products', 'catalog.id', '=', 'hierarchy_products.product_id')
@@ -19,20 +43,47 @@ class Products extends Controller
 
         // $table = DB::table('catalog')->paginate(32);
         // $table = DB::table('catalog')->take(20)->get();
-        return view('products', ['products' => $items, 'id' => $id]);
+        return response()
+        ->view('products', ['products' => $items, 'id' => $id])
+        ->cookie('cookie-uuid', Config::get('cookie-uuid'), Products::cookieUuidLifeTime);
     }
 
     public function show($url){
+        $this->checkCookieUuid();
+
         $item = DB::table('catalog')->where('URL адрес', $url)->get();
         if (count($item)){
-            return view('product', ['product' => (array)$item[0]]);
+            return response()
+            ->view('product', ['product' => (array)$item[0]])
+            ->cookie('cookie-uuid', Config::get('cookie-uuid'), Products::cookieUuidLifeTime);
         }
         else {
             return view('errors.404');
         }
     }
 
+    public function visited(Request $request){
+        $item = DB::table('visited_list')
+        ->where('product_id', $request->product_id)
+        ->where('cookie_uuid', $request->cookie_uuid)
+        ->get();
+
+        if (count($item)){
+            return response()->json([ 'server-answer' => "visit already exists." ]);
+        }
+        else {
+            DB::table('visited_list')
+            ->insert([
+                'product_id' => $request->product_id,
+                'cookie_uuid' => $request->cookie_uuid,
+            ]);
+            return response()->json([ 'server-answer' => "visit added." ]);
+        }
+    }
+
     public function showCategory($url){
+        $this->checkCookieUuid();
+
         $categories = DB::table('categories')
         ->where('url', $url)
         ->get();
@@ -56,7 +107,9 @@ class Products extends Controller
 
         // $table = DB::table('catalog')->paginate(32);
         // $table = DB::table('catalog')->take(20)->get();
-        return view('products', ['products' => $items, 'id' => $id]);
+        return response()
+        ->view('products', ['products' => $items, 'id' => $id])
+        ->cookie('cookie-uuid', Config::get('cookie-uuid'), Products::cookieUuidLifeTime);
     }
 
 }

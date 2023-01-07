@@ -28,9 +28,48 @@
             transition: 0.3s;
         }
 
+        div.card img {
+            transition: 0.3s;
+            filter: grayscale(0.5);
+        }
+
         div.card:hover {
             cursor: pointer;
-            transform: scale(1.05) rotateZ(2deg);
+            /* transform: scale(1.05) rotateZ(2deg); */
         }
+        
+        div.card:hover img {
+            filter: grayscale(0.0);
+        }
+
+        div.card:hover .wishButton,
+        div.card:hover .basketButton {
+            background-color: #0D6EFDAF;
+        }
+
+        .wishButton svg {
+            transition: 0.3s;
+        }
+
+        .wishButton:hover svg {
+            color: #FF0000;
+        }
+
+        .wishButton svg:first-child {
+            display: block;
+        }
+
+        .wishButton svg:last-child {
+            display: none;
+        }
+
+        .wishButton.wishset svg:first-child {
+            display: none;
+        }
+
+        .wishButton.wishset svg:last-child {
+            display: block;
+        }        
+        
     </style>
 @endpush

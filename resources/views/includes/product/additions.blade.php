@@ -1,5 +1,5 @@
 <div class="py-2 w-100">
-    <div class="d-flex flex-row w-100 fs-4 mt-0 mb-1 fw-bold">Дополнительные аксессуары</div>
+    <div class="d-flex flex-row w-100 fs-4 mt-3 fw-bold">Дополнительные аксессуары</div>
     @php
         // generate data by accessing properties https://github.com/fzaninotto/Faker
         /*

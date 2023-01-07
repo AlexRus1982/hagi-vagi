@@ -1,5 +1,5 @@
 <div class="py-2 w-100 d-flex flex-column justify-content-start">
-    <div class="d-flex flex-row w-100 fs-4 mt-0 mb-1 fw-bold">Вопросы и ответы</div>
+    <div class="d-flex flex-row w-100 fs-4 mt-3 fw-bold">Вопросы и ответы</div>
     <button type="button" class="btn btn-primary btn-sm mt-3 fw-bold" style="width: fit-content;">Задать вопрос</button>
     @php
         // generate data by accessing properties https://github.com/fzaninotto/Faker

@@ -1,28 +1,43 @@
 <?php
 
-Route::view('/adminpanel', 'admin.adminpanel');
+#region main requests
+Route::get('/', 'Products@showMain')->name('main');
 
-Route::view('/', 'main')->name('main');
 Route::get('/products', 'Products@showAll')->name('products');
 Route::get('/products/{url}', 'Products@showCategory')->name('category');
+
 Route::get('/product/{url}', 'Products@show')->name('product');
+Route::put('/visited', 'Products@visited')->name('product.visited');
+
 Route::get('/service/{url}', 'Services@show')->name('service');
+
 Route::get('/search', 'Search@showSearchResult')->name('search');
 
 Route::get('/basket/index', 'BasketController@index')->name('basket.index');
 Route::get('/basket/checkout', 'BasketController@checkout')->name('basket.checkout');
+#endregion
 
-Route::post('/test/get', function(){
+#region test requests
+Route::post('/test/get', function() {
     return '{"server_answer" : "success"}';
 });
 
-Route::view('/test', 'test')->name('test');
+Route::get('/test', function() {
+    $cookieUuid = Cookie::get('cookie-uuid');
+    $uuid = ($cookieUuid != '') ? $cookieUuid : (string) Str::uuid();
+    Config::set('cookie-uuid', $uuid);
 
+    // $cookie = Cookie::make('hagi-vagi-uuid', $uuid, 2 /* $minutes = 60 * 24 * 365 * 10; // 10 years */);
+    return response()->view('test')->cookie('cookie-uuid', Config::get('cookie-uuid'), 1);
+})->name('test');
+#endregion
 
 // Auth::routes();
 // Route::get('/home', 'HomeController@index')->name('home');
 
 #region admin requests
+Route::view('/adminpanel', 'admin.adminpanel');
+
 Route::prefix('admin')->group(function(){
 
     //--------------------------------------------------------------------------------------------------------

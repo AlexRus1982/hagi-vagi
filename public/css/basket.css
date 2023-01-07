@@ -1,6 +1,6 @@
 .basket {
     position: fixed;
-    top: 100px;
+    top: 75px;
     left: calc(100% - 100px);
     opacity: 0.8;
     display: flex;

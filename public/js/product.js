@@ -4,6 +4,22 @@ class ProductScript {
         console.log(this.constructor.name);
         this.MakeKeys();
         // this.MakeImages();
+        this.SetVisited();
+    }
+
+    SetVisited() {
+        $.ajax({
+            url : '/visited',
+            type : "PUT",
+            data : {
+                _token      : $('meta[name="csrf-token"]').attr('content'),
+                cookie_uuid : $('meta[name="cookie-uuid"]').attr('content'),
+                product_id  : $('meta[name="product-id"]').attr('content'),
+            },
+            success : (response) => {
+                console.debug(response);
+            },
+        });
     }
 
     MakeKeys(){
@@ -11,6 +27,18 @@ class ProductScript {
         $('.basketButton').on('click', function(event){
             const item_id = $(this).attr('item_id');
             basket.AddItem(item_id);
+
+            event.stopPropagation();
+            event.preventDefault();
+        });
+
+        $('.wishButton').off('click');
+        $('.wishButton').on('click', function(event){
+            const item_id = $(this).attr('item_id');
+            // basket.AddItem(item_id);
+            // alert(`${item_id} - wish`);
+
+            $(this).toggleClass('wishset');
 
             event.stopPropagation();
             event.preventDefault();

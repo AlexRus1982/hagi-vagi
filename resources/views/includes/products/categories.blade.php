@@ -17,7 +17,7 @@
                     $image = getImageUrl($category->category_image);
                     ?>
                         <a class="category-card" rel="noopener noreferrer" href="/products/{{$category->url}}" style="text-decoration: none; color: #000000; border:none; background: none; margin-right: 20px;">
-                            <div class="card m-2 ms-0 shadow p-1" style="min-width: 17rem; width: 17rem;">
+                            <div class="card m-2 ms-0 shadow p-0" style="min-width: 17rem; width: 17rem;">
                                 <div class="card-image d-flex justify-content-center flex-column" style="min-height: 270px; height: 270px;">
                                     <img src="{{$image}}" class="card-img-top" alt="{{$category->category_name}}" loading="lazy" style="height: 100%; width: 100%; object-fit: contain;">
                                 </div>

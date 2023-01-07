@@ -4,16 +4,40 @@
             <div class="fot">
 
                 <div class="d-flex flex-column logo-and-c">
-                    <img src="/images/logo.png" alt="" class="im">
+                    <img src="/images/logo_20201215105638.png" alt="logo" class="im">
                     <p class="c">© 2022. Все права защищены правообладателями</p>
                 </div>
 
                 <div class="stolbs">
                     <ul class="ps-0">
-                        <li class="stb__head">ТОВАРЫ</li>
-                        <li class="stb__item">Таблетки</li>
-                        <li class="stb__item">Ошейники</li>
-                        <li class="stb__item">Спреи</li>
+                    <li class="stb__head">КАТАЛОГ</li>
+
+                        @if (Route::is('main'))
+                        <? $parentId = 0; ?>
+                        @else
+                        <? 
+                            if(isset($id)) {
+                            $parentId = $id; 
+                            }
+                            else {
+                            $parentId = 0;
+                            }
+                        ?>
+                        @endif
+
+                        <?php
+                            $categories = DB::table('categories')
+                            ->join('hierarchy_category', 'categories.id', '=', 'hierarchy_category.category_id')
+                            ->where('parent_id', $parentId)
+                            ->orderBy('order_place')
+                            ->get();
+                            foreach($categories as $category){
+                              ?>
+                                <li class="stb__item">{{$category->category_name}}</li>
+                              <?
+                            }
+                        ?>
+                        
                     </ul>
                     <ul class="ps-0">
                         <li class="stb__head">КОМПАНИЯ</li>
@@ -35,10 +59,34 @@
             <div class="fot">
                 <div class="stolbs" style="flex-direction: column;">
                     <ul class="ps-0">
-                        <li class="stb__head">ТОВАРЫ</li>
-                        <li class="stb__item">Таблетки</li>
-                        <li class="stb__item">Ошейники</li>
-                        <li class="stb__item">Спреи</li>
+
+                        <li class="stb__head">КАТАЛОГ</li>
+                        @if (Route::is('main'))
+                        <? $parentId = 0; ?>
+                        @else
+                        <? 
+                            if(isset($id)) {
+                            $parentId = $id; 
+                            }
+                            else {
+                            $parentId = 0;
+                            }
+                        ?>
+                        @endif
+
+                        <?php
+                            $categories = DB::table('categories')
+                            ->join('hierarchy_category', 'categories.id', '=', 'hierarchy_category.category_id')
+                            ->where('parent_id', $parentId)
+                            ->orderBy('order_place')
+                            ->get();
+                            foreach($categories as $category){
+                              ?>
+                                <li class="stb__item">{{$category->category_name}}</li>
+                              <?
+                            }
+                        ?>
+
                         <li class="stb__head">КОМПАНИЯ</li>
                         @php
                             $items = DB::table('services')->get();
@@ -52,7 +100,7 @@
                     </ul>
 
                     <div class="d-flex flex-column logo-and-c">
-                        <img src="/images/logo.png" alt="" class="im">
+                        <img src="/images/logo_20201215105638.png" alt="logo" class="im">
                         <p class="c">© 2022. Все права защищены правообладателями</p>
                     </div>
 

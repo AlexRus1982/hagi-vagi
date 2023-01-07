@@ -1,4 +1,4 @@
-<div class="banner start">
+<div class="banner {{--start--}}">
     <div class="banner__text">Все для здоровья кошек и собак в одном месте</div>
     <div class="banner__image"><img src="/images/dog.png"></div>
 </div>

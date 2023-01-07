@@ -6,6 +6,7 @@
 
     $tableHeaders = DB::getSchemaBuilder()->getColumnListing('catalog');
 
+    $propertiesCounter = 0;
     foreach($tableHeaders as $key => $header) {
         if (mb_strpos($header, 'Свойство: ') !== false){
             $found = $properties->where('column_name', $header);
@@ -15,6 +16,7 @@
                     'column_name' => $header,
                 ]);
             }
+            $propertiesCounter++;
         }
     }
 
@@ -46,7 +48,7 @@
                             </div>
                         </div>
 
-                        <div class="header-main-content property-name flex-grow-1">Свойство</div>
+                        <div class="header-main-content property-name flex-grow-1">Свойство: всего ({{$propertiesCounter}})</div>
                         <div class="header-main-content property-show-filter">В фильтре</div>
                         <div class="header-main-content property-show-card">В карточке</div>
                         <div class="header-main-content property-counter">Используется</div>
@@ -102,6 +104,10 @@
                 <style>
                     .table-property-item:nth-child(odd) {
                         background-color: #EAEAFA;
+                    }
+
+                    .table-property-item:hover {
+                        background-color: #00FF002F;
                     }
 
                     .property-button {

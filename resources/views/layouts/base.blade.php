@@ -13,6 +13,9 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <!-- Cookie uuid для идентификации просмотренных товаров и списка желаний -->
+        <meta name="cookie-uuid" content="{{ Config::get('cookie-uuid') }}">
+
         <link href="/css/preloader.css" rel="stylesheet">
 
         <link rel="icon" href="/images/favicon.ico" type="image/x-icon">

@@ -8,24 +8,29 @@ export class Basket {
     constructor() {
         if ($('.basket').length == 0) return;
         this.MakeKeys();
+        this.UpdateBasket();
+    }
+
+    UpdateBasket() {
+        try {
+            window.query.Post(
+                "/api/order/hash",
+                { token: window.api_token, session_id : window.session_id },
+                (data) => {
+                    if(data.indexOf('Ошибка') < 0) {
+                        this.order_hash = data;
+                    }
+                    this.GetCount();
+                },
+                false
+            );
+        } catch (e) {
+            console.warn(e);
+        }
 
         setInterval(()=>{
-            try {
-                window.query.Post(
-                    "/api/order/hash",
-                    { token: window.api_token, session_id : window.session_id },
-                    (data) => {
-                        if(data.indexOf('Ошибка') < 0) {
-                            this.order_hash = data;
-                        }
-                        this.GetCount();
-                    },
-                    false
-                );
-            } catch (e) {
-                console.warn(e);
-            }
-        }, 1000);
+            this.UpdateBasket();
+        }, 10000);
     }
 
     RenderList(list){

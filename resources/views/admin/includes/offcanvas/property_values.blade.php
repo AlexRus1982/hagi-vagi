@@ -6,6 +6,7 @@
 
     $propertyIs = in_array($propertyName, $columnNames) ? true : false;
 
+    $valuesCounter = 0;
     if ($propertyIs) {
         $used = DB::table('catalog')
         ->where([
@@ -14,9 +15,32 @@
         ])
         ->get()
         ->unique($propertyName);
-
-        $valuesCounter = count($used);
     }
+
+    if ($propertyIs) {
+        $propertyArray = [];
+        $properties = DB::table('catalog')
+        ->select("{$propertyName}")
+        ->where([
+            [$propertyName, '<>', 'NULL'],
+            [$propertyName, '<>', ''],
+        ])
+        ->get();
+
+        foreach ($properties as $property) {
+            $splitArray = explode(';', $property->{$propertyName});
+
+            foreach ($splitArray as $splitProperty) {
+                array_push($propertyArray, $splitProperty);
+            }
+        }
+
+        $propertyCollection = collect($propertyArray);
+
+        $uniqCollection = $propertyCollection->countBy();
+        $valuesCounter = count($uniqCollection);
+    }
+
 
 ?>
 
@@ -58,8 +82,8 @@
                         </div>
                     </div>
 
-                    <div class="header-main-content property-value-name">Значение</div>
-                    <div class="header-main-content property-value-show-tag">Тэг</div>
+                    <div class="header-main-content property-value-name">Значение: всего ({{$valuesCounter}})</div>
+                    <div class="header-main-content property-value-show-tag"><div class="tag-header">Тэг</div></div>
                     <div class="header-main-content property-value-counter">Используется</div>
                     <div class="header-main-content property-value-buttons"> </div>
                 </div>
@@ -67,19 +91,14 @@
             <div class="table-items-body w-100 border border-top-0" style="max-height: calc(100vh - 210px); overflow-y: auto;">
                 <?php 
                     if ($propertyIs){
-                        foreach($used as $item) {
-                            $valueName = $item->{$propertyName};
-                            $valuesUsed = DB::table('catalog')
-                            ->where([
-                                [$propertyName, '=', $valueName],
-                            ])->get();
-    
-                            $valueCounter = count($valuesUsed);
+                        foreach($uniqCollection as $key => $item) {
+                            $valueName = $key;
+                            $valueCounter = $item;
                             $tagChecked = ''/*($property->in_card  != 0) ? 'checked' : ''*/;
                             ?>
-                                <div item-id="{{$item->id}}" class="table-property-value-item w-100 d-flex flex-row justify-content-between p-2" draggable="true">
+                                <div class="table-property-value-item w-100 d-flex flex-row justify-content-between p-2" draggable="true">
                                     <div class="property-value-check"><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></div>
-                                    <div class="property-value-name ">{{$valueName}}</div>
+                                    <div class="property-value-name"><input type="text" value="{{$valueName}}" disabled/></div>
                                     <div class="property-value-show-tag">
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" role="switch" {{$tagChecked}}>
@@ -101,6 +120,10 @@
                     background-color: #EAEAFA;
                 }
 
+                .table-property-value-item:hover {
+                    background-color: #00FF002F;
+                }
+
                 .property-value-button {
                     cursor: pointer;
                     transition: 0.3s;
@@ -119,16 +142,47 @@
 
                 .property-value-name {
                     min-width: 200px;
-                    text-align: start;
+                    /* text-align: start;
                     white-space: nowrap;
                     overflow: hidden;
-                    text-overflow: ellipsis;
+                    text-overflow: ellipsis; */
+                    display: flex;
+                    flex: auto;
+                    flex-direction: column;
+                }
+
+                .property-value-name input {
+                    background: none;
+                    border: 1px solid #0000004F;
+                    /* width: 100%; */
+                }
+
+                .property-value-name input:disabled {
+                    background: none;
+                    border: 1px solid #00000000;
+                    /* width: 100%; */
                 }
 
                 .property-value-show-tag {
-                    text-align: center;
-                    width: 120px;
+                    min-width: 60px;
+                    max-width: 60px;
                     margin-left: auto;
+                }
+
+                .property-value-show-tag .form-check {
+                    margin: 0px;
+                    padding: 0px;
+                }
+
+                .property-value-show-tag .form-switch .form-check-input {
+                    margin-left: 0px;
+                    margin-right: -6px;
+                }
+                
+                .tag-header {
+                    margin-left: auto;
+                    text-align: end;
+                    max-width: 60px;
                 }
 
                 .property-value-counter {
@@ -143,7 +197,7 @@
 
                 .table-property-value-item .form-check {
                     display: flex;
-                    justify-content: center;
+                    justify-content: flex-end;
                 }
 
             </style>
@@ -152,7 +206,7 @@
     </div>
 
     <div class="offcanvas-footer p-3 border-top d-flex justify-content-end">
-        <button id="property-save-button" type="button" class="btn btn-primary me-3">Сохранить</button>
+        <button id="property-values-save-button" type="button" class="btn btn-primary me-3">Сохранить</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Отмена</button>
     </div>
 

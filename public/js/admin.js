@@ -1286,6 +1286,29 @@ class AdminProperties {
             console.debug(itemId, itemName);
         });
 
+        $('.property-value-edit').off('click');
+        $('.property-value-edit').on('click', function() {
+            const item = $(this).parent().parent();
+            
+            const itemInput = item.find('.property-value-name input');
+            $('.property-value-name input').attr('disabled','');
+            itemInput.removeAttr('disabled');
+            const itemValue = itemInput.prop('value');
+            
+            itemInput.focus();
+            // let tmpStr = itemInput.val();
+            // itemInput.val('');
+            // itemInput.val(tmpStr);
+
+            $('.property-value-name input').off('blur')
+            itemInput.blur(function() {
+                $(this).attr('disabled','');
+            });
+
+            console.debug(itemValue);
+        });
+
+
         $('.property-delete').off('click');
         $('.property-delete').on('click', function() {
             const item = $(this).parent().parent();
@@ -1319,11 +1342,17 @@ class AdminProperties {
                     const newBody = $(response).find('.offcanvas-body');
                     $('#propertyValues .offcanvas-body').replaceWith(newBody);
 
-                    // this.MakeKeys();
+                    that.MakeKeys();
                     $('#propertyValues').offcanvas('show');
                 },
                 error: (e)=>console.warn('error', e),
             });
+        });
+
+        $('#property-values-save-button').off('click');
+        $('#property-values-save-button').on('click', function() {
+            messages.Success('Данные сохранены.');
+            $('#propertyValues').offcanvas('hide');
         });
 
         $('#property-save-button').off('click');
@@ -1341,6 +1370,7 @@ class AdminProperties {
                     type : "PUT",
                     data: { newName : `Свойство: ${propertyName}`, },
                     success: response => {
+                        messages.Success('Данные сохранены.');
                         $('#propertyEdit').offcanvas('hide');
                         that.UpdatePropertiesList();
                     },
@@ -1357,6 +1387,7 @@ class AdminProperties {
                         newName    : `Свойство: ${propertyName}`, 
                     },
                     success: response => {
+                        messages.Success('Данные сохранены.');
                         $('#propertyEdit').offcanvas('hide');
                         that.UpdatePropertiesList();
                     },
